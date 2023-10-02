@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody))]
@@ -28,9 +29,15 @@ public class Player : MonoBehaviour, IDamageable
     private event Action ArtificialFixedUpdateMethods = delegate { };
     private event Action ArtificialUpdateMethods = delegate { };
 
-    private EnemiesDetecter _enemiesDetecter;
+    
+    [SerializeField]
+    private LayerMask _enemyMas;
 
+    private List<Enemy> a = new List<Enemy>();
     List<Transform> nearEnemies= new List<Transform>();
+
+    private bool canFetch = true; 
+
 
     [Header("States")]
     private bool _canThrow = true;
@@ -42,12 +49,13 @@ public class Player : MonoBehaviour, IDamageable
         _life = _maxLife;
 
         _rigidbody = GetComponent<Rigidbody>();
-        _enemiesDetecter = GetComponent<EnemiesDetecter>();
 
         PlayerController controller = new PlayerController(this);
         ArtificialFixedUpdateMethods += controller.ArtificialFixedUpdate;
         ArtificialUpdateMethods += controller.ArtificialUpdate;
     }
+
+    private List<Enemy> enemies = new ();
 
     public float GetLife() => _life;
 
@@ -70,8 +78,22 @@ public class Player : MonoBehaviour, IDamageable
     {
         ArtificialUpdateMethods();
 
-        if (Input.GetKey(KeyCode.I))
-            _enemiesDetecter.Plays();
+        if (Input.GetKey(KeyCode.I) && canFetch)
+        {
+            Debug.Log("Try");
+            canFetch = false;
+            StartCoroutine(CanFetchAgain());
+            nearEnemies = a.EnemiesDetecting(transform, 10, 10, _enemyMas).Select(x => x.transform).ToList();
+            
+        }
+        
+        Debug.Log(nearEnemies.Count + "a");
+    }
+
+    IEnumerator CanFetchAgain()
+    {
+        yield return new WaitForSeconds(5f);
+        canFetch = true;
 
     }
 
@@ -88,7 +110,7 @@ public class Player : MonoBehaviour, IDamageable
         
         Instantiate(_grenadePrefab, _grenadeSpawnPoint.position, _grenadeSpawnPoint.rotation);
         _canThrow = false;
-        StartCoroutine(CDCorutine(_canThrow));
+        StartCoroutine(CDCorutine( _canThrow));
     }
 
     public void StartShooting()

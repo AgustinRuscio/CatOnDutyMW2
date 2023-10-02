@@ -342,6 +342,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1512693735, guid: 1740158d6b71b6945afe9a6d2881da55, type: 3}
+      propertyPath: _enemyType
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 8112298844032292267, guid: 1740158d6b71b6945afe9a6d2881da55, type: 3}
       propertyPath: m_Name
       value: Enemy
@@ -399,6 +403,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 8966405389429925769, guid: 051a0fe0e28cc784ca6473a6d22fec90, type: 3}
+      propertyPath: _enemyMas.m_Bits
+      value: 256
+      objectReference: {fileID: 0}
     - target: {fileID: 8966405389429925770, guid: 051a0fe0e28cc784ca6473a6d22fec90, type: 3}
       propertyPath: m_Name
       value: Player

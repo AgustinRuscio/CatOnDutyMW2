@@ -48,10 +48,9 @@ public class EnemiesDetecter : MonoBehaviour
         yield return new WaitForSeconds(.2f);
 
         Debug.Log("Corutina");
-
+    
         _enemyList = EnemiesDetector(10, amoutEnemies).OfType<Enemy>().Select(x => x.transform).ToList();
     } 
-
 
     private void OnDrawGizmos()
     {
