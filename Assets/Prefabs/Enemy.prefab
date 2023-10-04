@@ -225,7 +225,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c7a93187aea1e7741be0c92d8e99bef1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _enemyType: 0
+  _baseDamage: 15
+  _enemyType: 2
   _maxLife: 0
   _audioSource: {fileID: 1512693736}
   _meshRenderer: {fileID: 8112298844032292270}

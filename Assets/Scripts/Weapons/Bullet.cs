@@ -12,6 +12,8 @@ public class Bullet : MonoBehaviour
         _rigidBody = GetComponent<Rigidbody>();
 
         _rigidBody.AddForce(transform.forward * 1000);
+        
+        Destroy(gameObject, 10);
     }
     private void OnCollisionEnter(Collision collision)
     {
@@ -19,7 +21,7 @@ public class Bullet : MonoBehaviour
 
         if (col == null) return;
 
-        col.TakeDamage(15);
+        col.TakeDamage(105);
 
         Destroy(gameObject);
     }

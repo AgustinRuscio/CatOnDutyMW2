@@ -16,6 +16,8 @@ public class Grenade : MonoBehaviour
         _rigidBody = GetComponent<Rigidbody>();
 
         _rigidBody.AddForce(transform.forward * 250);
+        
+        Destroy(gameObject, 10);
     }
 
     private void OnCollisionEnter(Collision collision)
@@ -29,12 +31,15 @@ public class Grenade : MonoBehaviour
     {
         var inRange = Physics.OverlapSphere(transform.position, 5);
         var idamageablesOnRange = inRange.OfType<IDamageable>();
-
+        
+        Debug.Log("Entro");
+        
         if (idamageablesOnRange.Any())
         {
+        Debug.Log("Algo habia");
             foreach (var item in idamageablesOnRange)
             {
-                item.TakeDamage(17.5f);
+                item.TakeDamage(100.5f);
             }
 
             var instaKIlleable = idamageablesOnRange.Where(x => x.GetLife() < 25);

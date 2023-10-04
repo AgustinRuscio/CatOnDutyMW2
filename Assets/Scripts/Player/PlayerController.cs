@@ -17,6 +17,10 @@ public class PlayerController
 
         ArtificialUpdate += ThrowingGrenade;
         ArtificialUpdate += Shooting;
+        ArtificialUpdate += Featching;
+        ArtificialUpdate += ShowLastKill;
+        ArtificialUpdate += Target;
+        ArtificialUpdate += FreeTaregt;
     }
 
     private void Moving() => _player.Move(Input.GetAxis("Vertical"));
@@ -33,7 +37,21 @@ public class PlayerController
 
     private void ThrowingGrenade()
     {
-        if(Input.GetKey(KeyCode.Q))
-            _player.ThrowingGrenade();
+        if(Input.GetKey(KeyCode.Q)) _player.ThrowingGrenade();
     }
+    private void Target()
+    {
+        if(Input.GetKeyDown(KeyCode.E)) _player.TargetSystem();
+    }
+    private void FreeTaregt()
+    {
+        if(Input.GetKey(KeyCode.C)) _player.ReleasTarget();
+    }
+    
+    private void Featching()
+    {
+        if(Input.GetKey(KeyCode.I)) _player.Featch();
+    }
+    private void ShowLastKill() => _player.ShowLastEnemy(Input.GetKey(KeyCode.Tab));
+    
 }

@@ -2,6 +2,8 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Unity.VisualScripting;
+using UnityEditor;
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody))]
@@ -11,7 +13,7 @@ public class Player : MonoBehaviour, IDamageable
     private float _maxLife;
 
     private float _life;
-
+    
     [SerializeField]
     private Grenade _grenadePrefab;
 
@@ -29,6 +31,11 @@ public class Player : MonoBehaviour, IDamageable
     private event Action ArtificialFixedUpdateMethods = delegate { };
     private event Action ArtificialUpdateMethods = delegate { };
 
+    [SerializeField] 
+    private CanvasGroup _lastEnemyKill;
+
+    private Enemy _currentEnemy;
+    private int _currentEnemyIndex;
     
     [SerializeField]
     private LayerMask _enemyMas;
@@ -36,8 +43,9 @@ public class Player : MonoBehaviour, IDamageable
     private List<Enemy> a = new List<Enemy>();
     List<Transform> nearEnemies= new List<Transform>();
 
-    private bool canFetch = true; 
+    private bool canFetch = true;
 
+    private float _timerToClean;
 
     [Header("States")]
     private bool _canThrow = true;
@@ -55,8 +63,6 @@ public class Player : MonoBehaviour, IDamageable
         ArtificialUpdateMethods += controller.ArtificialUpdate;
     }
 
-    private List<Enemy> enemies = new ();
-
     public float GetLife() => _life;
 
     public void InstaKill() => Die();
@@ -69,7 +75,7 @@ public class Player : MonoBehaviour, IDamageable
             Die();
     }
 
-    public void Die()
+    private void Die()
     {
         
     }
@@ -77,29 +83,88 @@ public class Player : MonoBehaviour, IDamageable
     private void Update()
     {
         ArtificialUpdateMethods();
-
-        if (Input.GetKey(KeyCode.I) && canFetch)
-        {
-            Debug.Log("Try");
-            canFetch = false;
-            StartCoroutine(CanFetchAgain());
-            nearEnemies = a.EnemiesDetecting(transform, 10, 10, _enemyMas).Select(x => x.transform).ToList();
-            
-        }
         
-        Debug.Log(nearEnemies.Count + "a");
+        if (_currentEnemy != null)
+            transform.LookAt(_currentEnemy.transform.position);
+
+        _timerToClean += Time.deltaTime;
+
+        if (_timerToClean >= 7 && !_currentEnemy)
+            targets = new();
     }
 
-    IEnumerator CanFetchAgain()
-    {
-        yield return new WaitForSeconds(5f);
-        canFetch = true;
-
-    }
+   
 
     void FixedUpdate()
     {
         ArtificialFixedUpdateMethods();
+    }
+
+
+    public void ShowLastEnemy(bool active)
+    {
+       _lastEnemyKill.alpha = active ? 1 :  0;
+    }
+
+    #region  Features
+        public void GetHealth(float amount)
+    {
+        _life += amount;
+        
+        if (_life > _maxLife)
+            _life = _maxLife;
+    }
+    
+        public void Featch()
+        {
+            if(!canFetch) return;
+            
+            Debug.Log("Try");
+            canFetch = false;
+            StartCoroutine(CanFetchAgain());
+            nearEnemies = a.EnemiesDetecting(transform, 10, 10, _enemyMas).Select(x => x.transform).ToList();
+        }
+        IEnumerator CanFetchAgain()
+        {
+            yield return new WaitForSeconds(5f);
+            canFetch = true;
+        }
+
+        private List<Enemy> targets = new List<Enemy>();
+        public void TargetSystem()
+        {
+            if (!targets.Any())
+            {
+                var near = Physics.OverlapSphere(transform.position, 5, _enemyMas);
+
+                foreach (var VARIABLE in near)
+                {
+                    var current = VARIABLE.GetComponent<Enemy>();
+                    
+                    if(current == null) continue;
+                    
+                    targets.Add(current);
+                }
+                
+                if (targets.Any())
+                    _currentEnemy = targets.First();
+            }
+            else
+            {
+                _currentEnemy = targets.SkipWhile(x => x == _currentEnemy).First();
+            }
+        }
+
+        public void ReleasTarget()
+        {
+            _currentEnemy = null;
+            targets = new();
+        }
+    #endregion
+
+    private void OnDrawGizmos()
+    {
+        Gizmos.DrawWireSphere(transform.position, 5);
     }
 
     #region Attacking
@@ -125,7 +190,7 @@ public class Player : MonoBehaviour, IDamageable
     {
         while (_shooting)
         {
-            yield return new WaitForSeconds(.1f);
+            yield return new WaitForSeconds(.25f);
             Instantiate(_bulletPrefab, _bulletsSpawnPoint.position, _bulletsSpawnPoint.rotation);
         }
     }
