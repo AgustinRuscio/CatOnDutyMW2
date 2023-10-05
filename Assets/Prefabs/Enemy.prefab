@@ -1,5 +1,98 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &4579249315307066854
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 9187276571287040766}
+  m_Layer: 8
+  m_Name: Spawn (1)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &9187276571287040766
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4579249315307066854}
+  m_LocalRotation: {x: -0, y: -0.1776623, z: -0, w: 0.9840916}
+  m_LocalPosition: {x: 0.771, y: 0, z: 0.922}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 8112298844032292268}
+  m_RootOrder: 2
+  m_LocalEulerAnglesHint: {x: 0, y: -20.467, z: 0}
+--- !u!1 &5858516043946124809
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5654218175557864411}
+  m_Layer: 8
+  m_Name: Spawn (0)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &5654218175557864411
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5858516043946124809}
+  m_LocalRotation: {x: -0, y: -0.1776623, z: -0, w: 0.9840916}
+  m_LocalPosition: {x: -0.025, y: 0, z: -1.044}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 8112298844032292268}
+  m_RootOrder: 1
+  m_LocalEulerAnglesHint: {x: 0, y: -20.467, z: 0}
+--- !u!1 &7179555856060343399
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3915621434303989537}
+  m_Layer: 8
+  m_Name: Spawn (2)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3915621434303989537
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7179555856060343399}
+  m_LocalRotation: {x: -0, y: -0.1776623, z: -0, w: 0.9840916}
+  m_LocalPosition: {x: -0.992, y: 0, z: 0.297}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 8112298844032292268}
+  m_RootOrder: 3
+  m_LocalEulerAnglesHint: {x: 0, y: -20.467, z: 0}
 --- !u!1 &8112298844032292267
 GameObject:
   m_ObjectHideFlags: 0
@@ -35,6 +128,9 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 8112298844150445201}
+  - {fileID: 5654218175557864411}
+  - {fileID: 9187276571287040766}
+  - {fileID: 3915621434303989537}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -227,11 +323,20 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _baseDamage: 15
   _enemyType: 2
-  _maxLife: 0
+  _maxLife: 100
   _audioSource: {fileID: 1512693736}
   _meshRenderer: {fileID: 8112298844032292270}
   _detectedMat: {fileID: 2100000, guid: 82929dd936c312345960911337f118f1, type: 2}
   _normalMat: {fileID: 2100000, guid: 53742af7b807302408060ac6b8198e40, type: 2}
+  _myItems: []
+  _pickablesPrefabs:
+  - {fileID: 6600066757664583896, guid: a41e85053a086484eb6198256075b953, type: 3}
+  - {fileID: 2227180824387867664, guid: 2986a4a57d21fc34eaa2b5b7ef5ac942, type: 3}
+  - {fileID: 2904568659267553584, guid: 4b2fe51102eb20d4185be74db222aab7, type: 3}
+  _pickablesSpawnPoints:
+  - {fileID: 5858516043946124809}
+  - {fileID: 4579249315307066854}
+  - {fileID: 7179555856060343399}
 --- !u!1 &8112298844150445200
 GameObject:
   m_ObjectHideFlags: 0

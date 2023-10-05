@@ -4,31 +4,32 @@ using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
 
-public class HealthPicker : Pickables
+public class IncreaseSpeedPicker : Pickables
 {
     protected override void Interact()
     {
         switch (_type)
         {
             case PickableType.Common:
-                _p.GetHealth(5);
+                _p.IncreaseSpeed(1.1f, .5f);
                 break;
             case PickableType.NotCommon:
-                _p.GetHealth(15);
+                _p.IncreaseSpeed(1.15f, .7f);
                 break;
             case PickableType.NotTooCommonToBeCommonButTooRareToBeRare:
-                _p.GetHealth(25);
+                _p.IncreaseSpeed(1.20f, .5f);
                 break;
             case PickableType.Rare:
-                _p.GetHealth(30);
+                _p.IncreaseSpeed(1.25f, .7f);
                 break;
             case PickableType.UltraRare:
-                _p.GetHealth(40);
+                _p.IncreaseSpeed(1.5f, .7f);
                 break;
             case PickableType.Legendary:
-                _p.GetHealth(75);
+                _p.IncreaseSpeed(2, .75f);
                 break;
         }
+        
         
         Destroy(gameObject);
     }

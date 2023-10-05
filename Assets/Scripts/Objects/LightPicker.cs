@@ -4,29 +4,27 @@ using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
 
-public class HealthPicker : Pickables
+public class LightPicker : Pickables
 {
     protected override void Interact()
     {
         switch (_type)
         {
             case PickableType.Common:
-                _p.GetHealth(5);
+                _p.TurnLightsOn(.3f);
                 break;
             case PickableType.NotCommon:
-                _p.GetHealth(15);
+                _p.TurnLightsOn(.45f);
                 break;
             case PickableType.NotTooCommonToBeCommonButTooRareToBeRare:
-                _p.GetHealth(25);
-                break;
             case PickableType.Rare:
-                _p.GetHealth(30);
+                _p.TurnLightsOn(.5f);
                 break;
             case PickableType.UltraRare:
-                _p.GetHealth(40);
+                _p.TurnLightsOn(.75f);
                 break;
             case PickableType.Legendary:
-                _p.GetHealth(75);
+                _p.TurnLightsOn(1f);
                 break;
         }
         

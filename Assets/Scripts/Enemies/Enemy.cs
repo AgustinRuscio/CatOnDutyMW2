@@ -30,6 +30,17 @@ public abstract class Enemy : MonoBehaviour, IDamageable
     
     private Tuple<String, int, EnemyType> _stats;
 
+    [HideInInspector]
+    public List<Pickables> _myItems = new ();
+
+    [SerializeField]
+    private Pickables[] _pickablesPrefabs;
+    
+    private int pickablesNum;
+    
+    [SerializeField] 
+    private GameObject[] _pickablesSpawnPoints;
+    
     public float Damage => _totalDamage;
 
 
@@ -40,6 +51,7 @@ public abstract class Enemy : MonoBehaviour, IDamageable
         _totalDamage = _baseDamage;
 
         StartCoroutine(wait());
+
     }
         
     IEnumerator wait()
@@ -76,7 +88,7 @@ public abstract class Enemy : MonoBehaviour, IDamageable
         
         
         
-       // Debug.Log(_stats.Item1 + " : " + _stats.Item2 + " : " + _stats.Item3 + " : " + "Total Damage " + _totalDamage);
+        Debug.Log(_stats.Item1 + " : " + _stats.Item2 + " : " + _stats.Item3 + " : " + "Total Damage " + _totalDamage);
     }
     
     public void TakeDamage(float dmg)
@@ -91,7 +103,23 @@ public abstract class Enemy : MonoBehaviour, IDamageable
     }
 
     private void Died()
-    { 
+    {
+        pickablesNum = Random.Range(0, 3);
+        
+        for (int i = 0; i < pickablesNum; i++)
+        {
+            var randomizer = Random.Range(0, 3);
+
+            var toIntanciate = _pickablesPrefabs[randomizer];
+            
+            var item =Instantiate(toIntanciate, _pickablesSpawnPoints[i].transform.position,
+                _pickablesSpawnPoints[i].transform.rotation);
+            
+            item.SetType(PickableType.Legendary);
+            
+            _myItems.Add(item);
+        }
+        
         GameManager.instance.RemoveEnemy(this);
         Destroy(gameObject);
     }
@@ -102,15 +130,11 @@ public abstract class Enemy : MonoBehaviour, IDamageable
         switch (_enemyType)
         {
             case EnemyType.runner:
-                return UnityEngine.Random.Range(0, 37);
-                break;
+                return Random.Range(0, 37);
             case EnemyType.tank:
-                return UnityEngine.Random.Range(0, 101);
-                break;
+                return Random.Range(0, 101);
             case EnemyType.thief:
-                return UnityEngine.Random.Range(0, 251);
-                break;
-
+                return Random.Range(0, 251);
             default: 
                 return 0;
 

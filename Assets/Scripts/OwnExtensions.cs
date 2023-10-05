@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public static class OwnExtensions 
@@ -28,12 +29,13 @@ public static class OwnExtensions
 
     public static IEnumerable<string> EnemyNaming(this string name, int numberOfEnemies)
     {
-        string[] names = {"Bartolo", "Apolo", "Carlito", "", "Pichico", "Pepiña", "Cochito", "Pololo", "Max", "Chicho" };
+        string[] names = {"Bartolo", "Apolo", "Carlito", "Gay Tony", "Pichico", "Pepiña", "Cochito", "Pololo", "Max", "Chicho" };
+        //var a = completeName.Zip(dinasty, (n, N) => n + " " + N + "th").ToArray();
         
         while (numberOfEnemies > 0)
         {
             numberOfEnemies--;
-
+            
             int random = Random.Range(0, names.Length);
             name = names[random];
             

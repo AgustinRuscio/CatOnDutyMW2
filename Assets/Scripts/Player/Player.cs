@@ -28,6 +28,9 @@ public class Player : MonoBehaviour, IDamageable
 
     private Rigidbody _rigidbody;
 
+    [SerializeField]
+    private Light _pointLight;
+
     private event Action ArtificialFixedUpdateMethods = delegate { };
     private event Action ArtificialUpdateMethods = delegate { };
 
@@ -91,6 +94,12 @@ public class Player : MonoBehaviour, IDamageable
 
         if (_timerToClean >= 7 && !_currentEnemy)
             targets = new();
+        
+        if(Input.GetKeyDown(KeyCode.A))
+            GameManager.instance.GameEnd(true);
+        
+        if(Input.GetKeyDown(KeyCode.B))
+            GameManager.instance.GameEnd(false);
     }
 
    
@@ -114,7 +123,35 @@ public class Player : MonoBehaviour, IDamageable
         if (_life > _maxLife)
             _life = _maxLife;
     }
-    
+
+        public void IncreaseSpeed(float multiplayer, float time)
+        {
+            var normalSpeed = _speed;
+            _speed *= multiplayer;
+
+            StartCoroutine(ReturnToNormalSpeed(normalSpeed, time));
+        }
+
+        IEnumerator ReturnToNormalSpeed(float normalSpeed, float time )
+        {
+            yield return new WaitForSeconds(time);
+            _speed = normalSpeed;
+        }
+
+        public void TurnLightsOn(float time)
+        {
+            Debug.Log("Lights On");
+            _pointLight.gameObject.SetActive(true);
+            
+            StartCoroutine(TurnLightOff(time));
+        }
+
+        IEnumerator TurnLightOff(float time)
+        {
+            yield return new WaitForSeconds(time);
+            _pointLight.gameObject.SetActive(false);
+        }
+        
         public void Featch()
         {
             if(!canFetch) return;

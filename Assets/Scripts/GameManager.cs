@@ -21,10 +21,15 @@ public class GameManager : MonoBehaviour
     private List<Enemy> _enemiesKilled = new();
 
     [SerializeField]
-    private TextMeshProUGUI _lastKilled, _enemyKilledCount, _mostPowerful;
+    private TextMeshProUGUI _lastKilled, _enemyKilledCount, _mostPowerful, _objectCollected, _enemuesKilledFinal;
 
     private float _mostPowerfulDMg;
 
+    private IEnumerable<Pickables> _allPickablesColledted;
+
+    [SerializeField] 
+    private GameObject _losePanel, _winPanel, _finalStats;
+    
     private void Awake()
     {
         if (instance == null)
@@ -48,11 +53,17 @@ public class GameManager : MonoBehaviour
     private void SetEnemiesData()
     {
         _allNames = names.EnemyNaming(_enemies.Count).ToArray();
+            
+        string[] nickName = {"The viking", "El barbaro", "El sucio", "The beast", "El loco", "Crazy 8", "The gangster", "El malenate", "El gigante", "El bajito" };
+        int[] dinasty = {4,6,8,9,13, 12, 11,5,7};
+        
+        var completeName = _allNames.Zip(nickName, (n, N) => n + " " + N).Zip(dinasty, (n, N) => n + " " + N + "th").ToArray();;
+
         _allLvls = lvls.EnemyLeveling(_enemies.Count).ToArray();
 
         for (int i = 0; i < _enemies.Count; i++)
         {
-            _enemies[i].SetStats(_allNames[i], _allLvls[i]);
+            _enemies[i].SetStats(completeName[i], _allLvls[i]);
         }
     }
 
@@ -82,6 +93,18 @@ public class GameManager : MonoBehaviour
         
         _enemyKilledCount.text = _enemiesKilled.Count.ToString();
     }
+    
+    public void GameEnd(bool matchWin)
+    {
+        if(matchWin) _winPanel.SetActive(true);
+        else _losePanel.SetActive(true);
 
+        _finalStats.SetActive(true);
+        _allPickablesColledted = _enemiesKilled.SelectMany(x => x._myItems);
+        
+        _objectCollected.text = _allPickablesColledted.Count().ToString();
+        _enemuesKilledFinal.text = _enemiesKilled.Count.ToString();
+    }
+    
     private Tuple<String, int, EnemyType> k;
 }
