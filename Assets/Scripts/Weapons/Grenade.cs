@@ -4,12 +4,11 @@ using System.Linq;
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody))]
-public class Grenade : MonoBehaviour
+public class Grenade : AMoo
 {
     [SerializeField]
     private LayerMask _groundMask;
 
-    private Rigidbody _rigidBody;
 
     private void Awake()
     {

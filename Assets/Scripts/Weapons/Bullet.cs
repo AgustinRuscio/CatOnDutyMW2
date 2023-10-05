@@ -3,10 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody))]
-public class Bullet : MonoBehaviour
+public class Bullet : AMoo
 {
-    private Rigidbody _rigidBody;
-
     private void Awake()
     {
         _rigidBody = GetComponent<Rigidbody>();

@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using TMPro;
 using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
@@ -35,6 +36,17 @@ public class Player : MonoBehaviour, IDamageable
     private event Action ArtificialUpdateMethods = delegate { };
 
     [SerializeField] 
+    private List<AMoo> _myBullets   = new ();
+
+    private int _bulletsReady = 10;
+    private int _maxBulletsPossible = 15;
+    
+    [SerializeField] 
+    private List<AMoo> _mygranades = new ();
+    private int _grenadesReady = 5;
+    private int _maxgrebadesPossible = 10;
+    
+    [SerializeField] 
     private CanvasGroup _lastEnemyKill;
 
     private Enemy _currentEnemy;
@@ -49,11 +61,15 @@ public class Player : MonoBehaviour, IDamageable
     private bool canFetch = true;
 
     private float _timerToClean;
+    private float _timerToGiveAmmo;
 
     [Header("States")]
     private bool _canThrow = true;
     private bool _shooting = true;
 
+    [Header("UI")]
+    [SerializeField]
+    private TextMeshProUGUI _grenadeText, _bulletsText, _ammoTotalText;
 
     private void Awake()
     {
@@ -64,6 +80,8 @@ public class Player : MonoBehaviour, IDamageable
         PlayerController controller = new PlayerController(this);
         ArtificialFixedUpdateMethods += controller.ArtificialFixedUpdate;
         ArtificialUpdateMethods += controller.ArtificialUpdate;
+
+        SetUINumbers();
     }
 
     public float GetLife() => _life;
@@ -95,11 +113,28 @@ public class Player : MonoBehaviour, IDamageable
         if (_timerToClean >= 7 && !_currentEnemy)
             targets = new();
         
-        if(Input.GetKeyDown(KeyCode.A))
+        if(Input.GetKeyDown(KeyCode.R))
             GameManager.instance.GameEnd(true);
         
         if(Input.GetKeyDown(KeyCode.B))
             GameManager.instance.GameEnd(false);
+
+        _timerToGiveAmmo += Time.deltaTime;
+
+        if (_timerToGiveAmmo > 10)
+        {
+            _bulletsReady++;
+            if (_bulletsReady > _maxBulletsPossible)
+                _bulletsReady = _maxBulletsPossible;
+            
+            _grenadesReady++;
+            if (_grenadesReady > _maxgrebadesPossible)
+                _grenadesReady = _maxgrebadesPossible;
+
+            SetUINumbers();
+            _timerToGiveAmmo = 0;
+        }
+        CheckAmmo();
     }
 
    
@@ -115,15 +150,41 @@ public class Player : MonoBehaviour, IDamageable
        _lastEnemyKill.alpha = active ? 1 :  0;
     }
 
-    #region  Features
-        public void GetHealth(float amount)
+    private float CheckAmmo()
     {
-        _life += amount;
-        
-        if (_life > _maxLife)
-            _life = _maxLife;
+        return _myBullets.Concat(_mygranades).Count();
     }
 
+    private void SetUINumbers()
+    {
+        _grenadeText.text = _grenadesReady.ToString();
+        _bulletsText.text = _bulletsReady.ToString();
+        _ammoTotalText.text = CheckAmmo().ToString();
+    }
+    
+    #region  Features
+        public void GetHealth(float amount)
+        {
+            _life += amount;
+            
+            if (_life > _maxLife)
+                _life = _maxLife;
+        }
+
+        public void GetAmmo(int howMuch)
+        {
+            _bulletsReady += howMuch;
+            if (_bulletsReady > _maxBulletsPossible)
+                _bulletsReady = _maxBulletsPossible;
+
+            _grenadesReady += howMuch;
+            if (_grenadesReady > _maxgrebadesPossible)
+                _grenadesReady = _maxgrebadesPossible;
+            
+            
+            SetUINumbers();
+        }
+        
         public void IncreaseSpeed(float multiplayer, float time)
         {
             var normalSpeed = _speed;
@@ -210,8 +271,15 @@ public class Player : MonoBehaviour, IDamageable
     {
         if (!_canThrow) return;
         
-        Instantiate(_grenadePrefab, _grenadeSpawnPoint.position, _grenadeSpawnPoint.rotation);
+        if(_grenadesReady <= 0) return;
+
+        _grenadesReady--;
+        
+        var grenade = Instantiate(_grenadePrefab, _grenadeSpawnPoint.position, _grenadeSpawnPoint.rotation);
+        _myBullets.Add(grenade);
+        
         _canThrow = false;
+        SetUINumbers();
         StartCoroutine(CDCorutine( _canThrow));
     }
 
@@ -225,10 +293,14 @@ public class Player : MonoBehaviour, IDamageable
     
     IEnumerator Shooting()
     {
-        while (_shooting)
+        while (_shooting && _bulletsReady >0)
         {
+            _bulletsReady--;
             yield return new WaitForSeconds(.25f);
-            Instantiate(_bulletPrefab, _bulletsSpawnPoint.position, _bulletsSpawnPoint.rotation);
+            
+            var bullet = Instantiate(_bulletPrefab, _bulletsSpawnPoint.position, _bulletsSpawnPoint.rotation);
+            _myBullets.Add(bullet);
+            SetUINumbers();
         }
     }
 

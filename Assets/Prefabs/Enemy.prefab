@@ -333,6 +333,7 @@ MonoBehaviour:
   - {fileID: 6600066757664583896, guid: a41e85053a086484eb6198256075b953, type: 3}
   - {fileID: 2227180824387867664, guid: 2986a4a57d21fc34eaa2b5b7ef5ac942, type: 3}
   - {fileID: 2904568659267553584, guid: 4b2fe51102eb20d4185be74db222aab7, type: 3}
+  - {fileID: 4352535558263472901, guid: e89b102abfb70674b91ef33d7c8cf3c2, type: 3}
   _pickablesSpawnPoints:
   - {fileID: 5858516043946124809}
   - {fileID: 4579249315307066854}
