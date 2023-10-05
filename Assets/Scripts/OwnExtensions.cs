@@ -57,4 +57,15 @@ public static class OwnExtensions
         }
     }
 
+    public static IEnumerable<Enemy> EnemyGenre(this IEnumerable<Enemy> enemies)
+    {
+        foreach (var enemy in enemies)
+        {
+            var value = Random.Range(0, 101);
+            
+            if(value % 2 == 0)
+                yield return enemy;
+            
+        }
+    }
 }

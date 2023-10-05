@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using TMPro;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 public class GameManager : MonoBehaviour
 {
@@ -61,6 +62,15 @@ public class GameManager : MonoBehaviour
 
         _allLvls = lvls.EnemyLeveling(_enemies.Count).ToArray();
 
+        var femaleEnemies = _enemies.EnemyGenre();
+        
+        Debug.Log(femaleEnemies.Count());
+        
+        foreach (var female in femaleEnemies)
+        {
+            female.SetFemale();
+        }
+        
         for (int i = 0; i < _enemies.Count; i++)
         {
             _enemies[i].SetStats(completeName[i], _allLvls[i]);
@@ -72,8 +82,6 @@ public class GameManager : MonoBehaviour
         if(_enemies.Contains(enemy)) return;
         
         _enemies.Add(enemy);
-
-            
     }
     public void RemoveEnemy(Enemy enemy)
     {

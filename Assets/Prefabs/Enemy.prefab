@@ -328,6 +328,8 @@ MonoBehaviour:
   _meshRenderer: {fileID: 8112298844032292270}
   _detectedMat: {fileID: 2100000, guid: 82929dd936c312345960911337f118f1, type: 2}
   _normalMat: {fileID: 2100000, guid: 53742af7b807302408060ac6b8198e40, type: 2}
+  _maleMat: {fileID: 2100000, guid: 53742af7b807302408060ac6b8198e40, type: 2}
+  _femaleMat: {fileID: 2100000, guid: ccbdfa787596ac24caf99cd2cdcba882, type: 2}
   _myItems: []
   _pickablesPrefabs:
   - {fileID: 6600066757664583896, guid: a41e85053a086484eb6198256075b953, type: 3}

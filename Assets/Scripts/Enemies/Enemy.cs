@@ -26,7 +26,7 @@ public abstract class Enemy : MonoBehaviour, IDamageable
     private MeshRenderer _meshRenderer;
 
     [SerializeField]
-    private Material _detectedMat, _normalMat;
+    private Material _detectedMat, _normalMat, _maleMat, _femaleMat;
     
     private Tuple<String, int, EnemyType> _stats;
 
@@ -46,6 +46,7 @@ public abstract class Enemy : MonoBehaviour, IDamageable
 
     private void Awake()
     {
+        _normalMat = _maleMat;
         _life = _maxLife;
         _meshRenderer = GetComponent<MeshRenderer>();
         _totalDamage = _baseDamage;
@@ -65,6 +66,13 @@ public abstract class Enemy : MonoBehaviour, IDamageable
         return _stats;
     }
 
+    public void SetFemale()
+    {
+        Debug.Log("Female");
+        _normalMat = _femaleMat;
+        _meshRenderer.material = _normalMat;
+    }
+    
     public void SetStats(string name, int level)
     {
         _stats = new Tuple<string, int, EnemyType>(name, level, _enemyType);
@@ -85,8 +93,6 @@ public abstract class Enemy : MonoBehaviour, IDamageable
                 _totalDamage += .25f;
                 break;
         }
-        
-        
         
         Debug.Log(_stats.Item1 + " : " + _stats.Item2 + " : " + _stats.Item3 + " : " + "Total Damage " + _totalDamage);
     }
@@ -168,4 +174,10 @@ public enum EnemyType
     runner, 
     tank,
     thief
+}
+
+public enum EnemyGender
+{
+    Male, 
+    Female
 }

@@ -846,16 +846,8 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 1512693735, guid: 1740158d6b71b6945afe9a6d2881da55, type: 3}
-      propertyPath: _maxLife
-      value: 100
-      objectReference: {fileID: 0}
-    - target: {fileID: 1512693735, guid: 1740158d6b71b6945afe9a6d2881da55, type: 3}
       propertyPath: _enemyType
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1512693735, guid: 1740158d6b71b6945afe9a6d2881da55, type: 3}
-      propertyPath: _baseDamage
-      value: 15
       objectReference: {fileID: 0}
     - target: {fileID: 8112298844032292267, guid: 1740158d6b71b6945afe9a6d2881da55, type: 3}
       propertyPath: m_Name
@@ -2274,10 +2266,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 1512693735, guid: 1740158d6b71b6945afe9a6d2881da55, type: 3}
-      propertyPath: _maxLife
-      value: 100
-      objectReference: {fileID: 0}
     - target: {fileID: 8112298844032292267, guid: 1740158d6b71b6945afe9a6d2881da55, type: 3}
       propertyPath: m_Name
       value: Enemy
