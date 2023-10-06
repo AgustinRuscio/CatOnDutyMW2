@@ -30,14 +30,40 @@ public class GameManager : MonoBehaviour
 
     [SerializeField] 
     private GameObject _losePanel, _winPanel, _finalStats;
+
+    private List<Tuple<int, Dificulty, GameObject[]>> wavesData = new List<Tuple<int, Dificulty, GameObject[]>>();
+
+    private Tuple<int, Dificulty, GameObject[]> wave1;
+    private Tuple<int, Dificulty, GameObject[]> wave2;
+    private Tuple<int, Dificulty, GameObject[]> wave3;
+
+    [SerializeField] 
+    private GameObject[] waves1SpawnPoints, waves2SpawnPoints, waves3SpawnPoints;
     
+    [SerializeField] 
+    private List<GameObject[]> allWaypoints;
     private void Awake()
     {
         if (instance == null)
             instance = this;
         else
             Destroy(gameObject);
+        
+        allWaypoints.Add(waves1SpawnPoints);
+        allWaypoints.Add(waves2SpawnPoints);
+        allWaypoints.Add(waves3SpawnPoints);
+        
+        wavesData.Add(wave1);
+        wavesData.Add(wave2);
+        wavesData.Add(wave3);
 
+        var ammountAndDifficulty = wavesData.Count.DifficultySetter().ToArray();
+
+        for (int i = 0; i < ammountAndDifficulty.Count(); i++)
+        {
+            wavesData[i] = new Tuple<int, Dificulty, GameObject[]>(ammountAndDifficulty[i].Item1, ammountAndDifficulty[i].Item2, allWaypoints[i]);
+        }
+        
         _player = FindObjectOfType<Player>();
     }
 
@@ -115,4 +141,11 @@ public class GameManager : MonoBehaviour
     }
     
     private Tuple<String, int, EnemyType> k;
+    
+    
+}
+
+public enum Dificulty
+{
+    Easy, Medium, Hard
 }
