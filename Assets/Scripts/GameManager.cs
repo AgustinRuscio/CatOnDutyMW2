@@ -21,8 +21,11 @@ public class GameManager : MonoBehaviour
     private List<Enemy> _enemies = new();
     private List<Enemy> _enemiesKilled = new();
 
+    [SerializeField] 
+    private Enemy _enemyPrefab;
+    
     [SerializeField]
-    private TextMeshProUGUI _lastKilled, _enemyKilledCount, _mostPowerful, _objectCollected, _enemuesKilledFinal;
+    private TextMeshProUGUI _lastKilled, _enemyKilledCount, _mostPowerful, _objectCollected, _enemuesKilledFinal, _difficulty;
 
     private float _mostPowerfulDMg;
 
@@ -32,16 +35,21 @@ public class GameManager : MonoBehaviour
     private GameObject _losePanel, _winPanel, _finalStats;
 
     private List<Tuple<int, Dificulty, GameObject[]>> wavesData = new List<Tuple<int, Dificulty, GameObject[]>>();
-
-    private Tuple<int, Dificulty, GameObject[]> wave1;
-    private Tuple<int, Dificulty, GameObject[]> wave2;
-    private Tuple<int, Dificulty, GameObject[]> wave3;
-
-    [SerializeField] 
-    private GameObject[] waves1SpawnPoints, waves2SpawnPoints, waves3SpawnPoints;
     
     [SerializeField] 
-    private List<GameObject[]> allWaypoints;
+    private GameObject[] wavesSpawnPoints;
+
+    private int _enemyCounter;
+    private int _waveCounter;
+    
+    
+    private Tuple<String, int, EnemyType> k;
+
+    private List<Enemy> _enemiesInInstance = new List<Enemy>();
+    private bool _waveReady = false;
+    private bool _readyToSubstract;
+    
+    
     private void Awake()
     {
         if (instance == null)
@@ -49,22 +57,23 @@ public class GameManager : MonoBehaviour
         else
             Destroy(gameObject);
         
-        allWaypoints.Add(waves1SpawnPoints);
-        allWaypoints.Add(waves2SpawnPoints);
-        allWaypoints.Add(waves3SpawnPoints);
+        Time.timeScale = 1;
         
-        wavesData.Add(wave1);
-        wavesData.Add(wave2);
-        wavesData.Add(wave3);
-
-        var ammountAndDifficulty = wavesData.Count.DifficultySetter().ToArray();
-
+        var roundsSelected = Random.Range(2, 5);
+        
+        var ammountAndDifficulty = roundsSelected.DifficultySetter().ToArray();
+        _waveCounter = 0;
+        
+        Debug.Log(ammountAndDifficulty.Length +"aaaaa ");
+        
         for (int i = 0; i < ammountAndDifficulty.Count(); i++)
         {
-            wavesData[i] = new Tuple<int, Dificulty, GameObject[]>(ammountAndDifficulty[i].Item1, ammountAndDifficulty[i].Item2, allWaypoints[i]);
+            wavesData.Add(new Tuple<int, Dificulty, GameObject[]>(ammountAndDifficulty[i].Item1, ammountAndDifficulty[i].Item2, wavesSpawnPoints));
         }
         
+        Debug.Log(wavesData.Count() +" wave data ");
         _player = FindObjectOfType<Player>();
+        
     }
 
     private void Start()
@@ -72,11 +81,73 @@ public class GameManager : MonoBehaviour
         StartCoroutine(wait());
     }
 
+    private void Update()
+    {
+        WaveLoop();
+    }
+
     IEnumerator wait()
     {
         yield return null;
         SetEnemiesData();
+        
+        StartWave();
     }
+
+    private void StartWave()
+    {
+        var enemies = wavesData[_waveCounter].Item1;
+        
+        _difficulty.text = wavesData[_waveCounter].Item2.ToString();
+        var spawns = wavesData[_waveCounter].Item3;
+        
+        Debug.Log("Wave number: " + _waveCounter);
+        
+        StartCoroutine(wavesInstanciate(enemies,spawns));
+    }
+
+    IEnumerator wavesInstanciate(int amountOfEnemies, GameObject[] spawns)
+    {
+        yield return new WaitForSeconds(7.5f);
+        
+        while (amountOfEnemies > 0)
+        {
+            int randomPoint = Random.Range(0, spawns.Length);
+
+            var enemy = Instantiate(_enemyPrefab, spawns[randomPoint].transform.position,spawns[randomPoint].transform.rotation);
+            yield return new WaitForSeconds(.75f);
+
+            amountOfEnemies--;
+            _waveReady = true;
+        }
+    }
+
+    private void WaveLoop()
+    {
+        if(!_waveReady) return;
+        
+        if (_enemiesInInstance.Count <= 0)
+        {
+            _waveReady = false;
+            _readyToSubstract = true;
+            WaveEnd();
+        }
+    }
+    
+    private void WaveEnd()
+    {
+        if (_readyToSubstract)
+        {
+            _readyToSubstract = false;
+            _waveCounter++;
+            
+            if (_waveCounter >= wavesData.Count)
+                GameEnd(true);
+            else
+                StartWave();
+        }
+    }
+    
     private void SetEnemiesData()
     {
         _allNames = names.EnemyNaming(_enemies.Count).ToArray();
@@ -97,7 +168,7 @@ public class GameManager : MonoBehaviour
             female.SetFemale();
         }
         
-        for (int i = 0; i < _enemies.Count; i++)
+        for (int i = 0; i < _enemies.Count-1; i++)
         {
             _enemies[i].SetStats(completeName[i], _allLvls[i]);
         }
@@ -107,20 +178,34 @@ public class GameManager : MonoBehaviour
     {
         if(_enemies.Contains(enemy)) return;
         
+        _enemiesInInstance.Add(enemy);
         _enemies.Add(enemy);
+        
+        SetEnemiesData();
     }
     public void RemoveEnemy(Enemy enemy)
     {
+        if (_enemiesInInstance.Contains(enemy))
+            _enemiesInInstance.Remove(enemy);
+            
         if(!_enemies.Contains(enemy)) return;
-        
-        _enemies.Remove(enemy);
+
+        enemy._alive = false;
         
         _enemiesKilled.Add(enemy);
+        _enemies.Remove(enemy);
+        
+        if(_player.Current == enemy)
+            _player.NullIt();
+
+        if (_player.targets.Contains(enemy))
+            _player.targets.Remove(enemy);
+        
  
         Debug.Log("Update");
-        k = _enemiesKilled.Last().MyStats();
+        k = _enemiesKilled?.Last()?.MyStats();
         
-        _lastKilled.text = k.Item1 + " - " + k.Item2 + " - " + k.Item3;
+        _lastKilled.text = k?.Item1 + " - " + k?.Item2 + " - " + k?.Item3;
         
         _mostPowerfulDMg = _enemiesKilled.Count == 1 ? _enemiesKilled.Last().Damage : _enemiesKilled.Select(x=> x.Damage).OrderByDescending(x=>x).First();
         _mostPowerful.text = _mostPowerfulDMg.ToString();
@@ -130,6 +215,8 @@ public class GameManager : MonoBehaviour
     
     public void GameEnd(bool matchWin)
     {
+        Time.timeScale = 0;
+        
         if(matchWin) _winPanel.SetActive(true);
         else _losePanel.SetActive(true);
 
@@ -139,9 +226,6 @@ public class GameManager : MonoBehaviour
         _objectCollected.text = _allPickablesColledted.Count().ToString();
         _enemuesKilledFinal.text = _enemiesKilled.Count.ToString();
     }
-    
-    private Tuple<String, int, EnemyType> k;
-    
     
 }
 

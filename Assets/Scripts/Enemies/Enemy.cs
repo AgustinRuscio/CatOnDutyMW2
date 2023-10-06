@@ -43,24 +43,29 @@ public abstract class Enemy : MonoBehaviour, IDamageable
     
     public float Damage => _totalDamage;
 
+    public bool _alive = true;
+    public bool Alive => _alive;
 
-    private void Awake()
+    [SerializeField] 
+    private BoxCollider _boxCollider;
+    
+    [SerializeField] 
+    private MeshRenderer _box,_r;
+
+    private bool statsSetted = false;
+    private bool genreSetted = false;
+    
+    protected virtual void Awake()
     {
         _normalMat = _maleMat;
         _life = _maxLife;
         _meshRenderer = GetComponent<MeshRenderer>();
         _totalDamage = _baseDamage;
 
-        StartCoroutine(wait());
-
-    }
         
-    IEnumerator wait()
-    {
-        yield return null;
         GameManager.instance.AddEnemy(this);
     }
-
+        
     public Tuple<String, int, EnemyType>  MyStats()
     {
         return _stats;
@@ -68,6 +73,9 @@ public abstract class Enemy : MonoBehaviour, IDamageable
 
     public void SetFemale()
     {
+        if(genreSetted) return;
+
+        genreSetted = true;
         Debug.Log("Female");
         _normalMat = _femaleMat;
         _meshRenderer.material = _normalMat;
@@ -75,10 +83,33 @@ public abstract class Enemy : MonoBehaviour, IDamageable
     
     public void SetStats(string name, int level)
     {
+        if(statsSetted) return;
+
+        int randomForType = Random.Range(0, 4);
+
+        switch (randomForType)
+        {
+            case 0:
+                _enemyType = EnemyType.runner;
+                break;
+            case 1:
+                _enemyType = EnemyType.tank;
+                break;
+            case 2:
+                _enemyType = EnemyType.thief;
+                break;
+            default:
+                _enemyType = EnemyType.runner;
+                break;
+        }
+        
+        
+        
+        statsSetted = true;
         _stats = new Tuple<string, int, EnemyType>(name, level, _enemyType);
 
         _totalDamage += (0.5f * _stats.Item2);
-
+        
         switch (_enemyType)
         {
             case EnemyType.thief:
@@ -92,25 +123,30 @@ public abstract class Enemy : MonoBehaviour, IDamageable
             case EnemyType.tank:
                 _totalDamage += .25f;
                 break;
+            
+            default: 
+                _totalDamage += .01f;
+                break;
         }
-        
-        Debug.Log(_stats.Item1 + " : " + _stats.Item2 + " : " + _stats.Item3 + " : " + "Total Damage " + _totalDamage);
+
+        //Debug.Log(_stats.Item1 + " : " + _stats.Item2 + " : " + _stats.Item3 + " : " + "Total Damage " + _totalDamage);
     }
     
     public void TakeDamage(float dmg)
     {
         _life -= dmg;
-    Debug.Log("Auch");
+    //Debug.Log("Auch");
         if (_life <= 0)
         {
             Died();
-            Debug.Log("Mori");
+           // Debug.Log("Mori");
         }
     }
 
     private void Died()
     {
         pickablesNum = Random.Range(0, 3);
+        var pickablesRange = Random.Range(0, 6);
         
         for (int i = 0; i < pickablesNum; i++)
         {
@@ -120,14 +156,53 @@ public abstract class Enemy : MonoBehaviour, IDamageable
             
             var item =Instantiate(toIntanciate, _pickablesSpawnPoints[i].transform.position,
                 _pickablesSpawnPoints[i].transform.rotation);
+
+            PickableType tipe;
+
+            switch (pickablesRange)
+            {
+                case 0:
+                    tipe = PickableType.Common;
+                    break;
+                
+                case 1:
+                    tipe = PickableType.NotCommon;
+                    break;
+                
+                case 2:
+                    tipe = PickableType.NotTooCommonToBeCommonButTooRareToBeRare;
+                    break;
+                
+                case 3:
+                    tipe = PickableType.Rare;
+                    break;
+                
+                case 4:
+                    tipe = PickableType.UltraRare;
+                    break;
+                
+                case 5:
+                    tipe = PickableType.Legendary;
+                    break;
+                
+                default:
+                    tipe = PickableType.Common;
+                    break;
+            }
             
-            item.SetType(PickableType.Legendary);
+            item.SetType(tipe);
             
             _myItems.Add(item);
         }
         
         GameManager.instance.RemoveEnemy(this);
-        Destroy(gameObject);
+
+        _alive = false;
+        _boxCollider.enabled = false;
+        _box.enabled = false;
+        _r.enabled = false;
+
+        //Destroy(gameObject);
     }
 
 
@@ -143,7 +218,6 @@ public abstract class Enemy : MonoBehaviour, IDamageable
                 return Random.Range(0, 251);
             default: 
                 return 0;
-
         }
     }
 

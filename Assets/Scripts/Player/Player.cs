@@ -14,6 +14,12 @@ public class Player : MonoBehaviour, IDamageable
     private float _maxLife;
 
     private float _life;
+
+    [SerializeField]
+    private LifeBar _lifeBar;
+
+    [SerializeField]
+    private float _damage;
     
     [SerializeField]
     private Grenade _grenadePrefab;
@@ -38,26 +44,35 @@ public class Player : MonoBehaviour, IDamageable
     [SerializeField] 
     private List<AMoo> _myBullets   = new ();
 
-    private int _bulletsReady = 10;
-    private int _maxBulletsPossible = 15;
+    private int _bulletsReady = 100;
+    [SerializeField]
+    private int _maxBulletsPossible = 100;
     
     [SerializeField] 
     private List<AMoo> _mygranades = new ();
-    private int _grenadesReady = 5;
-    private int _maxgrebadesPossible = 10;
+    private int _grenadesReady = 60;
+    [SerializeField]
+    private int _maxgrebadesPossible = 90;
     
     [SerializeField] 
     private CanvasGroup _lastEnemyKill;
 
     private Enemy _currentEnemy;
     private int _currentEnemyIndex;
+
+    public Enemy Current => _currentEnemy;
+
+    public void NullIt() => _currentEnemy = null;
     
+
     [SerializeField]
     private LayerMask _enemyMas;
 
     private List<Enemy> a = new List<Enemy>();
     List<Transform> nearEnemies= new List<Transform>();
 
+    public List<Enemy> targets = new List<Enemy>();
+    
     private bool canFetch = true;
 
     private float _timerToClean;
@@ -84,6 +99,12 @@ public class Player : MonoBehaviour, IDamageable
         SetUINumbers();
     }
 
+    private void Start()
+    {
+        _lifeBar.UpdateLifeBar(_life ,_maxLife);
+        Debug.Log(_life / _maxLife);
+    }
+
     public float GetLife() => _life;
 
     public void InstaKill() => Die();
@@ -91,14 +112,15 @@ public class Player : MonoBehaviour, IDamageable
     public void TakeDamage(float dmg)
     {
         _life -= dmg;
-
+        _lifeBar.UpdateLifeBar(_life ,_maxLife);
+        
         if (_life <= 0)
             Die();
     }
 
     private void Die()
     {
-        
+        GameManager.instance.GameEnd(false);
     }
 
     private void Update()
@@ -106,17 +128,23 @@ public class Player : MonoBehaviour, IDamageable
         ArtificialUpdateMethods();
         
         if (_currentEnemy != null)
-            transform.LookAt(_currentEnemy.transform.position);
+        {
+           Vector3 directionToPlayer = _currentEnemy.transform.position - transform.position;
 
+           directionToPlayer.y = 0;
+           
+           transform.forward = directionToPlayer.normalized;
+           transform.position = new Vector3(transform.position.x, .5f, transform.position.z);
+        }
         _timerToClean += Time.deltaTime;
 
         if (_timerToClean >= 7 && !_currentEnemy)
             targets = new();
         
-        if(Input.GetKeyDown(KeyCode.R))
+        if(Input.GetKeyDown(KeyCode.P))
             GameManager.instance.GameEnd(true);
         
-        if(Input.GetKeyDown(KeyCode.B))
+        if(Input.GetKeyDown(KeyCode.O))
             GameManager.instance.GameEnd(false);
 
         _timerToGiveAmmo += Time.deltaTime;
@@ -169,6 +197,8 @@ public class Player : MonoBehaviour, IDamageable
             
             if (_life > _maxLife)
                 _life = _maxLife;
+            
+            _lifeBar.UpdateLifeBar(_life ,_maxLife);
         }
 
         public void GetAmmo(int howMuch)
@@ -220,7 +250,7 @@ public class Player : MonoBehaviour, IDamageable
             Debug.Log("Try");
             canFetch = false;
             StartCoroutine(CanFetchAgain());
-            nearEnemies = a.EnemiesDetecting(transform, 10, 10, _enemyMas).Select(x => x.transform).ToList();
+            nearEnemies = a.EnemiesDetecting(transform, 30, 10, _enemyMas).Select(x => x.transform).ToList();
         }
         IEnumerator CanFetchAgain()
         {
@@ -228,28 +258,22 @@ public class Player : MonoBehaviour, IDamageable
             canFetch = true;
         }
 
-        private List<Enemy> targets = new List<Enemy>();
         public void TargetSystem()
         {
             if (!targets.Any())
             {
-                var near = Physics.OverlapSphere(transform.position, 5, _enemyMas);
+                targets = Physics.OverlapSphere(transform.position, 5, _enemyMas).Select(x=> x.GetComponent<Enemy>()).Where(x=>x.Alive).ToList();
 
-                foreach (var VARIABLE in near)
-                {
-                    var current = VARIABLE.GetComponent<Enemy>();
-                    
-                    if(current == null) continue;
-                    
-                    targets.Add(current);
-                }
-                
                 if (targets.Any())
                     _currentEnemy = targets.First();
             }
             else
             {
-                _currentEnemy = targets.SkipWhile(x => x == _currentEnemy).First();
+                var a = targets.SkipWhile(x => x == _currentEnemy);
+
+                if (a.Any())
+                    _currentEnemy = a.First();
+
             }
         }
 
@@ -276,6 +300,7 @@ public class Player : MonoBehaviour, IDamageable
         _grenadesReady--;
         
         var grenade = Instantiate(_grenadePrefab, _grenadeSpawnPoint.position, _grenadeSpawnPoint.rotation);
+        grenade.SetDamage(25);
         _myBullets.Add(grenade);
         
         _canThrow = false;
@@ -299,6 +324,7 @@ public class Player : MonoBehaviour, IDamageable
             yield return new WaitForSeconds(.25f);
             
             var bullet = Instantiate(_bulletPrefab, _bulletsSpawnPoint.position, _bulletsSpawnPoint.rotation);
+            bullet.SetDamage(_damage);
             _myBullets.Add(bullet);
             SetUINumbers();
         }

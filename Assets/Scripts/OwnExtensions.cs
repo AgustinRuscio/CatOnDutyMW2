@@ -17,7 +17,7 @@ public static class OwnExtensions
 
             if (posibleEnemy != null)
             {
-                if(posibleEnemy.DetectonChanceCalculate() > 25) continue;
+                //if(posibleEnemy.DetectonChanceCalculate() > 25) continue;
                 
                 Debug.Log("qiee");
                     posibleEnemy.Moan();

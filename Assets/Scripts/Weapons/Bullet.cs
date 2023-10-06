@@ -1,26 +1,28 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody))]
 public class Bullet : AMoo
 {
+    
     private void Awake()
     {
         _rigidBody = GetComponent<Rigidbody>();
 
         _rigidBody.AddForce(transform.forward * 1000);
-        
-        Destroy(gameObject, 10);
+
+        Destroy(gameObject, 7.5f);
     }
-    private void OnCollisionEnter(Collision collision)
+
+
+    private void OnTriggerEnter(Collider other)
     {
-        var col = collision.collider.gameObject.GetComponent<IDamageable>();
+        var col = other.gameObject.GetComponent<IDamageable>();
 
         if (col == null) return;
 
-        col.TakeDamage(105);
+        col.TakeDamage(_damage);
 
         Destroy(gameObject);
     }
+
 }
