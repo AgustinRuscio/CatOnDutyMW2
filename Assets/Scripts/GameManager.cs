@@ -64,7 +64,7 @@ public class GameManager : MonoBehaviour
         var ammountAndDifficulty = roundsSelected.DifficultySetter().ToArray();
         _waveCounter = 0;
         
-        Debug.Log(ammountAndDifficulty.Length +"aaaaa ");
+        //Debug.Log(ammountAndDifficulty.Length +"aaaaa ");
         
         for (int i = 0; i < ammountAndDifficulty.Count(); i++)
         {
@@ -101,7 +101,7 @@ public class GameManager : MonoBehaviour
         _difficulty.text = wavesData[_waveCounter].Item2.ToString();
         var spawns = wavesData[_waveCounter].Item3;
         
-        Debug.Log("Wave number: " + _waveCounter);
+        //Debug.Log("Wave number: " + _waveCounter);
         
         StartCoroutine(wavesInstanciate(enemies,spawns));
     }
@@ -161,7 +161,7 @@ public class GameManager : MonoBehaviour
 
         var femaleEnemies = _enemies.EnemyGenre();
         
-        Debug.Log(femaleEnemies.Count());
+        //Debug.Log(femaleEnemies.Count());
         
         foreach (var female in femaleEnemies)
         {

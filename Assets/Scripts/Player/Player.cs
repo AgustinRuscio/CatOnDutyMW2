@@ -149,7 +149,7 @@ public class Player : MonoBehaviour, IDamageable
 
         _timerToGiveAmmo += Time.deltaTime;
 
-        if (_timerToGiveAmmo > 10)
+        if (_timerToGiveAmmo > 2)
         {
             _bulletsReady++;
             if (_bulletsReady > _maxBulletsPossible)
@@ -231,7 +231,7 @@ public class Player : MonoBehaviour, IDamageable
 
         public void TurnLightsOn(float time)
         {
-            Debug.Log("Lights On");
+            //Debug.Log("Lights On");
             _pointLight.gameObject.SetActive(true);
             
             StartCoroutine(TurnLightOff(time));
@@ -254,7 +254,7 @@ public class Player : MonoBehaviour, IDamageable
         }
         IEnumerator CanFetchAgain()
         {
-            yield return new WaitForSeconds(5f);
+            yield return new WaitForSeconds(3f);
             canFetch = true;
         }
 
@@ -262,17 +262,24 @@ public class Player : MonoBehaviour, IDamageable
         {
             if (!targets.Any())
             {
-                targets = Physics.OverlapSphere(transform.position, 5, _enemyMas).Select(x=> x.GetComponent<Enemy>()).Where(x=>x.Alive).ToList();
+                targets = Physics.OverlapSphere(transform.position, 15, _enemyMas).Select(x=> x.GetComponent<Enemy>()).Where(x=>x.Alive).ToList();
+
+                Debug.Log(targets.Count + "Count del overlap");
 
                 if (targets.Any())
                     _currentEnemy = targets.First();
             }
             else
             {
-                var a = targets.SkipWhile(x => x == _currentEnemy);
+                var a = targets.SkipWhile(x => x == _currentEnemy).Take(1);
+
+                Debug.Log(a.Count() + " Count del ya obtenido");
 
                 if (a.Any())
+                {
                     _currentEnemy = a.First();
+                    Debug.Log(_currentEnemy.name + " current name");
+                }
 
             }
         }

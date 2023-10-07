@@ -76,7 +76,7 @@ public abstract class Enemy : MonoBehaviour, IDamageable
         if(genreSetted) return;
 
         genreSetted = true;
-        Debug.Log("Female");
+        //Debug.Log("Female");
         _normalMat = _femaleMat;
         _meshRenderer.material = _normalMat;
     }
